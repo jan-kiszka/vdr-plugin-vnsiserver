@@ -99,7 +99,12 @@ VNSISocket::Action()
 			// Read the header. It is fixed site and contains the remaining
 			// bytes to read.
 			Header header;
-			if ( sizeof(header) != m_socket.read(&header, sizeof(header)) )
+			ssize_t headerLength = m_socket.read(&header, sizeof(header));
+			if (headerLength == 0)
+			{
+				return;
+			}
+			else if ( sizeof(header) != headerLength )
 			{
 				throw std::runtime_error( "Failed to read header" );
 			}
