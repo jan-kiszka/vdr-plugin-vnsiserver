@@ -13,6 +13,7 @@
 #include "StatusCommands.h"
 
 #include <memory>
+#include <cxxabi.h>
 
 #include <arpa/inet.h>
 
@@ -53,7 +54,7 @@ VNSISocket::unlock()
 void
 VNSISocket::Invalidate()
 {
-	Cancel( -1 );
+	Cancel( 0 );
 	m_socket.Invalidate();
 }
 
@@ -146,6 +147,10 @@ VNSISocket::Action()
 	{
 		ERRORLOG( "Socket error: '%s'. Dropping connection", error.what() );
 		m_queue.enqueue( std::make_shared<SocketError>() );
+	}
+	catch ( abi::__forced_unwind& )
+	{
+		throw;
 	}
 	catch ( ... )
 	{
